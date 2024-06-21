@@ -1,0 +1,118 @@
+// Padding(
+//               padding: const EdgeInsets.only(left: 20, right: 20, top: 150),
+//               child: Padding(
+//                 padding: const EdgeInsets.all(8.0),
+//                 child: Container(
+//                   decoration: BoxDecoration(
+//                     color: const Color.fromRGBO(221, 221, 221, 1),
+//                     borderRadius:
+//                         BorderRadius.circular(20.0), // Radio de las esquinas
+//                   ),
+//                   child: SingleChildScrollView(
+//                     child: Padding(
+//                       padding: const EdgeInsets.all(10),
+//                       child: !sentinela
+//                           ? const CircularProgressIndicator()
+//                           : Form(
+//                               key: formUsuario,
+//                               child: Column(
+//                                 children: [
+//                                   TextFormField(
+//                                     controller: usuarioIngresado,
+//                                     keyboardType: TextInputType.text,
+//                                     decoration: const InputDecoration(
+//                                         icon: Icon(Icons.person),
+//                                         iconColor:
+//                                             Color.fromRGBO(225, 36, 36, 1),
+//                                         labelText: 'Usuario'),
+//                                     validator: (value) {
+//                                       if (value!.isEmpty) {
+//                                         return 'El Usuario es requerido!';
+//                                       } else {
+//                                         return null;
+//                                       }
+//                                     },
+//                                   ),
+//                                   TextFormField(
+//                                     controller: contrasenaIngresada,
+//                                     keyboardType: TextInputType.text,
+//                                     decoration: const InputDecoration(
+//                                         icon: Icon(Icons.password_outlined),
+//                                         iconColor:
+//                                             Color.fromRGBO(225, 36, 36, 1),
+//                                         labelText: 'Contraseña'),
+//                                     validator: (value) {
+//                                       if (value!.isEmpty) {
+//                                         return 'La contraseña es requerida!';
+//                                       } else {
+//                                         return null;
+//                                       }
+//                                     },
+//                                   ),
+//                                   const SizedBox(height: 30),
+//                                   ElevatedButton(
+//                                     style: ButtonStyle(
+//                                         backgroundColor:
+//                                             MaterialStateProperty.all(
+//                                                 const Color.fromRGBO(
+//                                                     225, 36, 36, 1))),
+//                                     onPressed: () {
+//                                       if (!formUsuario.currentState!
+//                                           .validate()) {
+//                                         print('Formulario no válido');
+//                                       } else {
+//                                         // Buscar el usuario ingresado en los datos obtenidos de la API
+//                                         final usuario = usuarioIngresado.text;
+//                                         final contrasena =
+//                                             contrasenaIngresada.text;
+
+//                                         final usuarioEncontrado =
+//                                             data.firstWhere(
+//                                           (user) =>
+//                                               user['email'] == usuario &&
+//                                               user['contraseña'] == contrasena,
+//                                           orElse: () => null,
+//                                         );
+
+//                                         if (usuarioEncontrado != null) {
+//                                           // El usuario y la contraseña coinciden con los datos de la API
+//                                           final route = MaterialPageRoute(
+//                                               builder: (context) =>
+//                                                   const PedidosScreen());
+//                                           Navigator.pushReplacement (context, route);
+//                                         } else {
+//                                           // Usuario o contraseña incorrectos
+//                                           print(
+//                                               'Usuario o contraseña incorrecto');
+//                                           showDialog(
+//                                             context: context,
+//                                             builder: (BuildContext context) {
+//                                               return AlertDialog(
+//                                                 title: Text('Alerta'),
+//                                                 content: Text(
+//                                                     'Usuario o contraseña incorrecto'),
+//                                                 actions: <Widget>[
+//                                                   TextButton(
+//                                                     child: Text('Cerrar'),
+//                                                     onPressed: () {
+//                                                       Navigator.of(context)
+//                                                           .pop();
+//                                                     },
+//                                                   ),
+//                                                 ],
+//                                               );
+//                                             },
+//                                           );
+//                                         }
+//                                       }
+//                                     },
+//                                     child: const Text('Acceder'),
+//                                   )
+//                                 ],
+//                               ),
+//                             ),
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ),
