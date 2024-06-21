@@ -19,8 +19,7 @@ class Acceso extends StatefulWidget {
 }
 
 class _MainAppState extends State<Acceso> {
-  List<dynamic> data = [];
-  var sentinela = false;
+  var sentinela = true;
   bool isFirstTime = true;
 
   final GlobalKey<FormState> formUsuario = GlobalKey<FormState>();
@@ -32,7 +31,6 @@ class _MainAppState extends State<Acceso> {
   void initState() {
     super.initState();
     checkFirstTime();
-    getUsuarios();
   }
 
   Future<void> checkFirstTime() async {
@@ -50,19 +48,41 @@ class _MainAppState extends State<Acceso> {
     prefs.setBool('first_time', false);
   }
 
-  Future<void> getUsuarios() async {
-    final response = await http.get(Uri.parse(
-        'https://api-luchosoft-mysql.onrender.com/configuracion/usuarios'));
+  Future<void> login(String email, String password) async {
+    final url = Uri.parse('https://api-luchosoft-mysql.onrender.com/auth/login');
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': email,
+        'contraseña': password,
+      }),
+    );
 
     if (response.statusCode == 200) {
-      List<dynamic> decodedData = json.decode(response.body);
-
-      setState(() {
-        data = decodedData;
-        sentinela = true;
-      });
+      final route = MaterialPageRoute(builder: (context) => const PedidosScreen());
+      Navigator.pushReplacement(context, route);
     } else {
-      print('Failed to load data. Status code: ${response.statusCode}');
+      final errorMsg = json.decode(response.body)['msg'];
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Alerta'),
+            content: Text(errorMsg),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Cerrar'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -185,45 +205,10 @@ class _MainAppState extends State<Acceso> {
                                   if (!formUsuario.currentState!.validate()) {
                                     print('Formulario no válido');
                                   } else {
-                                    // Buscar el usuario ingresado en los datos obtenidos de la API
-                                    final usuario = usuarioIngresado.text;
-                                    final contrasena = contrasenaIngresada.text;
-
-                                    final usuarioEncontrado = data.firstWhere(
-                                      (user) =>
-                                          user['email'] == usuario &&
-                                          user['contraseña'] == contrasena,
-                                      orElse: () => null,
-                                    );
-
-                                    if (usuarioEncontrado != null) {
-                                      // El usuario y la contraseña coinciden con los datos de la API
-                                      final route = MaterialPageRoute(
-                                          builder: (context) =>
-                                              const PedidosScreen());
-                                      Navigator.pushReplacement(context, route);
-                                    } else {
-                                      // Usuario o contraseña incorrectos
-                                      print('Usuario o contraseña incorrecto');
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text('Alerta'),
-                                            content: const Text(
-                                                'Correo o contraseña incorrecto'),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: const Text('Cerrar'),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    }
+                                    // Ejecutar la función login con los datos del formulario
+                                    final email = usuarioIngresado.text;
+                                    final password = contrasenaIngresada.text;
+                                    login(email, password);
                                   }
                                 },
                                 child: Padding(
